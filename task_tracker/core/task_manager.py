@@ -2,6 +2,8 @@ import pathlib
 import json
 from datetime import datetime
 
+from core.exceptions import EmptyStorage
+
 
 class TaskManager:
     
@@ -15,7 +17,8 @@ class TaskManager:
     
     def __call__(self, *args, **kwds):
         commands = {
-            "add": self.add_task
+            "add": self.add_task,
+            "update": self.update_task
         }
         return commands[self.command](*args, **kwds)
         
@@ -40,5 +43,41 @@ class TaskManager:
         }
         
         tasks[task_id] = task
+        with open(self.storage_path, "w", encoding="utf-8") as storage:
+            json.dump(tasks, storage, indent=4, ensure_ascii=False)
+        
+        print(f"Task added successfully (ID: {task_id})")
+        
+    def update_task(self, task_id: int, description: str):
+        
+        if self.storage_path.exists():
+            with open(self.storage_path, "r", encoding="utf-8") as storage:
+                try:
+                    tasks = json.load(storage)
+                    if not tasks:
+                        raise EmptyStorage
+                except json.decoder.JSONDecodeError:
+                    pass
+                except EmptyStorage as e:
+                    print(e)
+        
+
+        try:
+            if task_id not in tasks:
+                raise IndexError(f"There is not task ID {task_id} in storage.")
+        except IndexError as e:
+            print(e)
+            return
+        
+        
+        task = tasks[task_id]
+        
+        tasks[task_id] = {
+            "description": description,
+            "status": task["status"],
+            "createdAt": task["createdAt"],
+            "updatedAt": datetime.now().isoformat()
+        }
+        
         with open(self.storage_path, "w", encoding="utf-8") as storage:
             json.dump(tasks, storage, indent=4, ensure_ascii=False)

@@ -11,7 +11,7 @@ add_parser = subparser.add_parser("add")
 add_parser.add_argument("description")
 
 update_parser = subparser.add_parser("update")
-update_parser.add_argument("task_id", type=int)
+update_parser.add_argument("task_id")
 update_parser.add_argument("description")
 
 delete_parser = subparser.add_parser("delete")
