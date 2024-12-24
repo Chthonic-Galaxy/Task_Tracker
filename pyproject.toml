@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "task_tracker"
+version = "0.1.0"
+description = ""
+authors = ["Chthonic-Galaxy <162060169+Chthonic-Galaxy@users.noreply.github.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
