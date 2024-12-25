@@ -29,14 +29,9 @@ class TaskManager:
     def add_task(self, description: str):
         
         task_id = 0
-        tasks = {}
-        if self.storage_path.exists():
-            with open(self.storage_path, "r", encoding="utf-8") as storage:
-                try:
-                    tasks = json.load(storage)
-                    task_id = max(int(task) for task in tasks) + 1
-                except json.decoder.JSONDecodeError:
-                    pass
+        tasks = self.__validate(existence=True, contents=True)
+        if tasks:
+            task_id = max(int(task) for task in tasks) + 1
         
         task = {
             "description": description,
@@ -46,37 +41,13 @@ class TaskManager:
         }
         
         tasks[task_id] = task
-        self._write_data_into_storage(tasks, storage)
+        self._write_data_into_storage(tasks, self.storage_path)
         
         print(f"Task added successfully (ID: {task_id})")
         
     def update_task(self, task_id: str, description: str):
         
-        if self.storage_path.exists():
-            with open(self.storage_path, "r", encoding="utf-8") as storage:
-                try:
-                    tasks = json.load(storage)
-                    if not tasks:
-                        raise EmptyStorage
-                except json.decoder.JSONDecodeError:
-                    pass
-                except EmptyStorage as e:
-                    print(e)
-        else:
-            try:
-                raise StorageNotExists
-            except StorageNotExists as e:
-                print(e)
-                return
-        
-
-        try:
-            if task_id not in tasks:
-                raise IndexError(f"There is not task ID {task_id} in storage.")
-        except IndexError as e:
-            print(e)
-            return
-        
+        tasks = self.__validate(existence=True, contents=True, task_id=task_id)
         
         task = tasks[task_id]
         
@@ -87,66 +58,19 @@ class TaskManager:
             "updatedAt": datetime.now().isoformat()
         }
         
-        self._write_data_into_storage(tasks, storage)
+        self._write_data_into_storage(tasks, self.storage_path)
     
     def delete_task(self, task_id: str):
         
-        if self.storage_path.exists():
-            with open(self.storage_path, "r", encoding="utf-8") as storage:
-                try:
-                    tasks = json.load(storage)
-                    if not tasks:
-                        raise EmptyStorage
-                except json.decoder.JSONDecodeError:
-                    pass
-                except EmptyStorage as e:
-                    print(e)
-        else:
-            try:
-                raise StorageNotExists
-            except StorageNotExists as e:
-                print(e)
-                return
-        
-
-        try:
-            if task_id not in tasks:
-                raise IndexError(f"There is not task ID {task_id} in storage.")
-        except IndexError as e:
-            print(e)
-            return
+        tasks = self.__validate(existence=True, contents=True, task_id=task_id)
         
         del tasks[task_id]
         
-        self._write_data_into_storage(tasks, storage)
+        self._write_data_into_storage(tasks, self.storage_path)
         
     def task_marking(self, task_id: str, status: str):
         
-        if self.storage_path.exists():
-            with open(self.storage_path, "r", encoding="utf-8") as storage:
-                try:
-                    tasks = json.load(storage)
-                    if not tasks:
-                        raise EmptyStorage
-                except json.decoder.JSONDecodeError:
-                    pass
-                except EmptyStorage as e:
-                    print(e)
-        else:
-            try:
-                raise StorageNotExists
-            except StorageNotExists as e:
-                print(e)
-                return
-        
-
-        try:
-            if task_id not in tasks:
-                raise IndexError(f"There is not task ID {task_id} in storage.")
-        except IndexError as e:
-            print(e)
-            return
-        
+        tasks = self.__validate(existence=True, contents=True, task_id=task_id)
         
         task = tasks[task_id]
         
@@ -157,32 +81,53 @@ class TaskManager:
             "updatedAt": datetime.now().isoformat()
         }
         
-        self._write_data_into_storage(tasks, storage)
+        self._write_data_into_storage(tasks, self.storage_path)
     
     def task_list(self, status=None):
         
-        if self.storage_path.exists():
-            with open(self.storage_path, "r", encoding="utf-8") as storage:
-                try:
-                    tasks = json.load(storage)
-                    if not tasks:
-                        raise EmptyStorage
-                except json.decoder.JSONDecodeError:
-                    pass
-                except EmptyStorage as e:
-                    print(e)
-        else:
-            try:
-                raise StorageNotExists
-            except StorageNotExists as e:
-                print(e)
-                return
+        tasks = self.__validate(existence=True, contents=True)
         
         if not status:
             for task in tasks.values():
                 print(task["description"])
             return
         
+        for task in filter(lambda task_def: task_def["status"] == status, tasks.values()):
+            print(task["description"])
+    
+    def __validate(self, existence: bool = True, contents: bool = False, strict: bool = False, task_id: None | int = None) -> dict | None:
+        
+        tasks = {}
+        
+        if existence:
+            if not self.storage_path.exists():
+                raise StorageNotExists
+        if contents:
+            with open(self.storage_path, "r", encoding="utf-8") as storage:
+                try:
+                    tasks = json.load(storage)
+                except json.decoder.JSONDecodeError as e:
+                    if strict:
+                        raise
+                    print(e)
+                if not tasks:
+                    try:
+                        raise EmptyStorage
+                    except EmptyStorage as e:
+                        if strict:
+                            raise
+                        else:
+                            print(f"[IGNORE] {e}")                    
+                            tasks = {}
+        if task_id is not None:
+            if task_id not in tasks:
+                raise IndexError(f"There is not task ID {task_id} in storage.")
+        
+        return tasks
+        
+    
+    def __mapper(self, task: dict, tasks: dict, storage: str | pathlib.Path):
+        ...
     
     def _write_data_into_storage(self, tasks: dict, storage: str | pathlib.Path):
         with open(self.storage_path, "w", encoding="utf-8") as storage:
