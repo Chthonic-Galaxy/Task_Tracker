@@ -19,7 +19,8 @@ class TaskManager:
         commands = {
             "add": self.add_task,
             "update": self.update_task,
-            "delete": self.delete_task
+            "delete": self.delete_task,
+            "marking": self.task_marking
         }
         return commands[self.command](*args, **kwds)
         
@@ -115,6 +116,45 @@ class TaskManager:
             return
         
         del tasks[task_id]
+        
+        self._write_data_into_storage(tasks, storage)
+        
+    def task_marking(self, task_id: str, status: str):
+        
+        if self.storage_path.exists():
+            with open(self.storage_path, "r", encoding="utf-8") as storage:
+                try:
+                    tasks = json.load(storage)
+                    if not tasks:
+                        raise EmptyStorage
+                except json.decoder.JSONDecodeError:
+                    pass
+                except EmptyStorage as e:
+                    print(e)
+        else:
+            try:
+                raise StorageNotExists
+            except StorageNotExists as e:
+                print(e)
+                return
+        
+
+        try:
+            if task_id not in tasks:
+                raise IndexError(f"There is not task ID {task_id} in storage.")
+        except IndexError as e:
+            print(e)
+            return
+        
+        
+        task = tasks[task_id]
+        
+        tasks[task_id] = {
+            "description": task["description"],
+            "status": status,
+            "createdAt": task["createdAt"],
+            "updatedAt": datetime.now().isoformat()
+        }
         
         self._write_data_into_storage(tasks, storage)
             
