@@ -20,7 +20,8 @@ class TaskManager:
             "add": self.add_task,
             "update": self.update_task,
             "delete": self.delete_task,
-            "marking": self.task_marking
+            "marking": self.task_marking,
+            "list": self.task_list
         }
         return commands[self.command](*args, **kwds)
         
@@ -157,7 +158,32 @@ class TaskManager:
         }
         
         self._write_data_into_storage(tasks, storage)
-            
+    
+    def task_list(self, status=None):
+        
+        if self.storage_path.exists():
+            with open(self.storage_path, "r", encoding="utf-8") as storage:
+                try:
+                    tasks = json.load(storage)
+                    if not tasks:
+                        raise EmptyStorage
+                except json.decoder.JSONDecodeError:
+                    pass
+                except EmptyStorage as e:
+                    print(e)
+        else:
+            try:
+                raise StorageNotExists
+            except StorageNotExists as e:
+                print(e)
+                return
+        
+        if not status:
+            for task in tasks.values():
+                print(task["description"])
+            return
+        
+    
     def _write_data_into_storage(self, tasks: dict, storage: str | pathlib.Path):
         with open(self.storage_path, "w", encoding="utf-8") as storage:
             json.dump(tasks, storage, indent=4, ensure_ascii=False)
