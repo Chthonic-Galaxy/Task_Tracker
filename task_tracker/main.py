@@ -1,6 +1,6 @@
 import argparse
 
-from core.task_manager import TaskManager
+from task_tracker.core.task_manager import TaskManager
 
 # Initialize parser
 parser = argparse.ArgumentParser()
@@ -33,10 +33,8 @@ if __name__ == "__main__":
     
     if args["command"] in ("mark-in-progress", "mark-done"):
         args["status"] = "in-progress" if args["command"] == "mark-in-progress" else "done"
-        args["command"] = "marking"
-    
-    try:
-        tm = TaskManager(args.pop("command"))
-        tm(**args)
-    finally:
-        tm._write_data_into_storage(tm.map, tm.map_path)
+        args["command"] = "marking"    
+
+    tm = TaskManager(args.pop("command"))
+    tm(**args)
+    tm._write_data_into_storage(tm.map, tm.map_path)

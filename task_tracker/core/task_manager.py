@@ -31,13 +31,10 @@ class TaskManager:
     
     
     def __load_map(self):
-        print(f"[LOADING] map({self.map_path})")
         try:
             data = self.__validate(self.map_path, existence=True, contents=True)
-            print("[LOADED] map")
             return data
         except Exception:
-            print("[ERROR] loading map")
             return {}
     
     
@@ -45,7 +42,7 @@ class TaskManager:
         
         task_id = 0
         tasks = self.__validate(existence=True, contents=True)
-        if tasks:
+        if tasks and len(self.map):
             task_id = max(int(task_id) for task_id in self.map) + 1
         
         task = {
@@ -172,5 +169,5 @@ class TaskManager:
             
     
     def _write_data_into_storage(self, data: dict, storage: str | pathlib.Path):
-        with open(storage, "w", encoding="utf-8") as storage:
-            json.dump(data, storage, indent=4, ensure_ascii=False, sort_keys=True)
+        with open(storage, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
