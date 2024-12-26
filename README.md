@@ -54,6 +54,10 @@ The Task Tracker is a command-line tool. You can run it using the `task_tracker/
 ```bash
 python task_tracker/main.py <command> [arguments]
 ```
+OR
+```bash
+python -m task_tracker.main <command> [arguments]
+```
 
 **Available Commands:**
 
