@@ -35,5 +35,8 @@ if __name__ == "__main__":
         args["status"] = "in-progress" if args["command"] == "mark-in-progress" else "done"
         args["command"] = "marking"
     
-    tm = TaskManager(args.pop("command"))
-    tm(**args)
+    try:
+        tm = TaskManager(args.pop("command"))
+        tm(**args)
+    finally:
+        tm._write_data_into_storage(tm.map, tm.map_path)
