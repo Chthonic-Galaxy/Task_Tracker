@@ -1,4 +1,3 @@
-```markdown
 # 🚀 Task Tracker - Your Simple Command-Line Task Manager
 
 Keep your life organized with the Task Tracker, a lightweight and easy-to-use command-line tool for managing your tasks. Whether it's grocery lists, project deadlines, or personal reminders, Task Tracker helps you stay on top of things without the clutter of a full-fledged application.
@@ -22,11 +21,9 @@ Before you begin, make sure you have Python 3.6 or higher installed on your syst
 1. **Clone the repository:**
 
    ```bash
-   git clone <YOUR_REPOSITORY_URL>
+   git clone https://github.com/Chthonic-Galaxy/Task_Tracker.git
    cd task-tracker
    ```
-
-   *(Replace `<YOUR_REPOSITORY_URL>` with the actual URL of your repository.)*
 
 2. **Install dependencies using Poetry (recommended):**
 
@@ -141,15 +138,6 @@ Here's how you can contribute:
 4. **Push your branch** to your forked repository.
 5. **Submit a pull request** to the main repository.
 
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE.txt - *Create a LICENSE.txt file if you intend to use an open-source license*).
-
-## 📧 Contact
-
-If you have any questions or feedback, feel free to reach out to [Your Name/Email Address].
-
 ---
 
 **Enjoy managing your tasks with Task Tracker!**
-```
